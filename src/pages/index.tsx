@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import styles from "./index.module.css";
 import { useRef } from "react";
+import { toast } from "react-hot-toast";
 
 const CreatePostWizard = () => {
   const { data: sessionData } = useSession();
@@ -17,6 +18,14 @@ const CreatePostWizard = () => {
         input.current.value = "";
       }
       await ctx.posts.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content?.[0];
+      if (errorMessage) {
+        toast.error(errorMessage);
+      } else {
+        toast.error("Failed post. Please type only emoji");
+      }
     },
   });
 
