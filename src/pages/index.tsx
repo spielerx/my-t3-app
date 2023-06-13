@@ -1,9 +1,64 @@
-import styles from "./index.module.css";
 import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
+import Image from "next/image";
 import { api } from "~/utils/api";
+import type { RouterOutputs } from "~/utils/api";
+import styles from "./index.module.css";
+import { useRef } from "react";
+
+const CreatePostWizard = () => {
+  const { data: sessionData } = useSession();
+  const ctx = api.useContext();
+  const input = useRef<HTMLInputElement>(null);
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: async () => {
+      if (input?.current) {
+        input.current.value = "";
+      }
+      await ctx.posts.getAll.invalidate();
+    },
+  });
+
+  if (!sessionData) return null;
+
+  return (
+    <div>
+      {sessionData.user.image && (
+        <Image src={sessionData.user.image} width={48} height={48} alt="" />
+      )}
+      <input type="text" placeholder="Add post (only emoji)" ref={input} />
+      <button
+        onClick={() => {
+          if (input?.current?.value) {
+            mutate({
+              content: input.current.value,
+            });
+          }
+        }}
+        disabled={isPosting}
+      >
+        Add
+      </button>
+    </div>
+  );
+};
+
+type PostWithUser = RouterOutputs["posts"]["getAll"][number];
+
+const PostView = ({ post, author }: PostWithUser) => {
+  return (
+    <div key={post.id}>
+      <div>{author?.name}</div>
+      <div>
+        {author?.image && (
+          <Image src={author?.image} width={24} height={24} alt="" />
+        )}
+      </div>
+      <div>{post.content}</div>
+    </div>
+  );
+};
 
 const Home: NextPage = () => {
   const { data } = api.posts.getAll.useQuery();
@@ -20,38 +75,11 @@ const Home: NextPage = () => {
           <h1 className={styles.title}>
             Create <span className={styles.pinkSpan}>T3</span> App
           </h1>
-          <div className={styles.cardRow}>
-            <Link
-              className={styles.card}
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className={styles.cardTitle}>First Steps →</h3>
-              <div className={styles.cardText}>
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className={styles.card}
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className={styles.cardTitle}>Documentation →</h3>
-              <div className={styles.cardText}>
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
+          <CreatePostWizard />
           <div className={styles.showcaseContainer}>
             <AuthShowcase />
           </div>
-          <div>
-            {data?.map((post) => (
-              <div key={post.id}>{post.content}</div>
-            ))}
-          </div>
+          <div style={{ color: "white" }}>{data?.map(PostView)}</div>
         </div>
       </main>
     </>
