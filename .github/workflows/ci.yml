@@ -17,7 +17,7 @@ jobs:
         run: yarn install
 
       - name: Run TypeScript checking
-        run: yarn run tsc
+        run: yarn run typecheck
 
       - name: Run linting
         run: yarn run lint
