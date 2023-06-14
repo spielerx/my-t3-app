@@ -3,23 +3,16 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import type { User } from "next-auth";
 import { z } from "zod";
 import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
 import { TRPCError } from "@trpc/server";
+import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 
 const ratelimit = new Ratelimit({
   redis: kv,
   limiter: Ratelimit.fixedWindow(3, "1m"),
   prefix: "myt3/ratelimit",
-});
-
-const filterUserForClient = ({ id, name, email, image }: User) => ({
-  id,
-  name,
-  email,
-  image,
 });
 
 export const postsRouter = createTRPCRouter({

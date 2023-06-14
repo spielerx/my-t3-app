@@ -7,6 +7,7 @@ import type { RouterOutputs } from "~/utils/api";
 import styles from "./index.module.css";
 import { useRef } from "react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 const CreatePostWizard = () => {
   const { data: sessionData } = useSession();
@@ -58,13 +59,17 @@ type PostWithUser = RouterOutputs["posts"]["getAll"][number];
 const PostView = ({ post, author }: PostWithUser) => {
   return (
     <div key={post.id}>
-      <div>{author?.name}</div>
+      <Link href={`/@${author?.name ?? ""}`}>
+        <div>{author?.name}</div>
+      </Link>
       <div>
         {author?.image && (
           <Image src={author?.image} width={24} height={24} alt="" />
         )}
       </div>
-      <div>{post.content}</div>
+      <Link href={`/post/${post.id}`}>
+        <div>{post.content}</div>
+      </Link>
     </div>
   );
 };
