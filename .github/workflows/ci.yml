@@ -1,0 +1,23 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  DATABASE_URL: "https://fake.com"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run TypeScript checking
+        run: yarn run tsc
+
+      - name: Run linting
+        run: yarn run lint
