@@ -7,6 +7,24 @@ import { prisma } from "~/server/db";
 import { appRouter } from "~/server/api/root";
 import superjson from "superjson";
 
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+    author: props.userId,
+  });
+
+  if (isLoading) return <div>loading</div>;
+
+  if (!data || data.length === 0) return <div>User has not posted</div>;
+
+  return (
+    <div>
+      {data.map((post) => (
+        <div key={post.id}>{post.content}</div>
+      ))}
+    </div>
+  );
+};
+
 const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
     username,
@@ -17,7 +35,7 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   return (
     <>
       <Head>
-        <title>{data.name}</title>>
+        <title>{data.name}</title>
       </Head>
       <main className={styles.main}>
         <div className={styles.container}>
