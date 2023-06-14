@@ -4,6 +4,12 @@ on: [push, pull_request]
 
 env:
   DATABASE_URL: "https://fake.com"
+  NEXTAUTH_SECRET: "secret"
+  NEXTAUTH_URL: "https://fake.com"
+  DISCORD_CLIENT_ID: "1"
+  DISCORD_CLIENT_SECRET: "secret"
+  KV_REST_API_URL: "https://fake.com"
+  KV_REST_API_TOKEN: "secret"
 
 jobs:
   build:
